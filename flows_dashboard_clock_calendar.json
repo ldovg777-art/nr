@@ -1,0 +1,129 @@
+[
+    {
+        "id": "1a2b3c4d5e6f7890",
+        "type": "tab",
+        "label": "Часы и календарь",
+        "disabled": false,
+        "info": "Проект демонстрирует отображение часов и календаря на панели Node-RED Dashboard."
+    },
+    {
+        "id": "d4c2b1a098765432",
+        "type": "ui_tab",
+        "name": "Информационный экран",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "e1234567890abcdf",
+        "type": "ui_group",
+        "name": "Дата и время",
+        "tab": "d4c2b1a098765432",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "f111111111111111",
+        "type": "inject",
+        "z": "1a2b3c4d5e6f7890",
+        "name": "Каждую секунду",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 120,
+        "wires": [
+            [
+                "f222222222222222"
+            ]
+        ]
+    },
+    {
+        "id": "f222222222222222",
+        "type": "function",
+        "z": "1a2b3c4d5e6f7890",
+        "name": "Формат даты/времени",
+        "func": "const now = new Date();\n\nconst timeFormatter = new Intl.DateTimeFormat('ru-RU', {\n    hour: '2-digit',\n    minute: '2-digit',\n    second: '2-digit'\n});\nconst time = timeFormatter.format(now);\n\nconst dateFormatter = new Intl.DateTimeFormat('ru-RU', {\n    weekday: 'long',\n    day: '2-digit',\n    month: 'long',\n    year: 'numeric'\n});\nlet dateText = dateFormatter.format(now);\nif (dateText.length > 0) {\n    dateText = dateText.charAt(0).toUpperCase() + dateText.slice(1);\n}\n\nconst calendarData = {\n    year: now.getFullYear(),\n    month: now.getMonth(),\n    day: now.getDate()\n};\n\nreturn [\n    { payload: time },\n    { payload: dateText },\n    { payload: calendarData }\n];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "f333333333333333"
+            ],
+            [
+                "f444444444444444"
+            ],
+            [
+                "f555555555555555"
+            ]
+        ]
+    },
+    {
+        "id": "f333333333333333",
+        "type": "ui_text",
+        "z": "1a2b3c4d5e6f7890",
+        "group": "e1234567890abcdf",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Часы",
+        "label": "Время",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 660,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f444444444444444",
+        "type": "ui_text",
+        "z": "1a2b3c4d5e6f7890",
+        "group": "e1234567890abcdf",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Дата",
+        "label": "Дата",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 660,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "f555555555555555",
+        "type": "ui_template",
+        "z": "1a2b3c4d5e6f7890",
+        "group": "e1234567890abcdf",
+        "name": "Календарь",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<div class=\"calendar-container\">\n    <div class=\"calendar-widget\"></div>\n</div>\n<script>\n(function(scope) {\n    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];\n    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];\n\n    function renderCalendar(container, data) {\n        if (!container || !data) {\n            return;\n        }\n        const year = data.year;\n        const month = data.month;\n        const today = data.day;\n\n        const firstDay = new Date(year, month, 1);\n        const firstDayIndex = (firstDay.getDay() + 6) % 7;\n        const daysInMonth = new Date(year, month + 1, 0).getDate();\n\n        let html = '<div class=\"calendar-header\">' + monthNames[month] + ' ' + year + '</div>';\n        html += '<table class=\"calendar-table\"><thead><tr>';\n        weekDays.forEach(day => {\n            html += '<th>' + day + '</th>';\n        });\n        html += '</tr></thead><tbody>';\n\n        let date = 1;\n        for (let row = 0; row < 6 && date <= daysInMonth; row++) {\n            html += '<tr>';\n            for (let col = 0; col < 7; col++) {\n                if (row === 0 && col < firstDayIndex) {\n                    html += '<td class=\"empty\"></td>';\n                } else if (date > daysInMonth) {\n                    html += '<td class=\"empty\"></td>';\n                } else {\n                    let classes = 'calendar-day';\n                    if (date === today) {\n                        classes += ' today';\n                    }\n                    html += '<td class=\"' + classes + '\">' + date + '</td>';\n                    date++;\n                }\n            }\n            html += '</tr>';\n        }\n        html += '</tbody></table>';\n        container.innerHTML = html;\n    }\n\n    scope.$watch('msg', function(msg) {\n        if (!msg) {\n            return;\n        }\n        const container = scope.$element[0].querySelector('.calendar-widget');\n        renderCalendar(container, msg.payload);\n    });\n})(scope);\n</script>\n<style>\n.calendar-container {\n    width: 100%;\n}\n.calendar-header {\n    font-size: 1.4em;\n    font-weight: 600;\n    text-align: center;\n    margin-bottom: 0.5em;\n}\n.calendar-table {\n    width: 100%;\n    border-collapse: collapse;\n    text-align: center;\n}\n.calendar-table th {\n    padding: 0.3em 0;\n    font-weight: 600;\n}\n.calendar-day {\n    padding: 0.6em 0;\n    border-radius: 4px;\n}\n.calendar-day.today {\n    background-color: #0094ff;\n    color: #ffffff;\n    font-weight: 600;\n}\n.calendar-table td {\n    padding: 0.4em 0;\n}\n.calendar-table td.empty {\n    opacity: 0.2;\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 660,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    }
+]
