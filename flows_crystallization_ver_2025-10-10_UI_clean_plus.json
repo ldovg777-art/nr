@@ -6131,7 +6131,7 @@
     "y": 80,
     "wires": [
       [
-        "30b23a31e46130ae"
+        "5a9e4bcf5c9f7f32"
       ]
     ]
   },
@@ -6477,5 +6477,33 @@
         "72933ec49a454a73"
       ]
     ]
+  },
+  {
+    "id": "5a9e4bcf5c9f7f32",
+    "type": "change",
+    "z": "e8bc55b391f479e3",
+    "name": "Настройка точек графика",
+    "rules": [
+      {
+        "t": "set",
+        "p": "ui_control",
+        "pt": "msg",
+        "to": "{\"chartOptions\":{\"elements\":{\"point\":{\"radius\":5,\"hoverRadius\":7,\"hitRadius\":9,\"borderWidth\":1}}}}",
+        "tot": "json"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 1810,
+    "y": 80,
+    "wires": [
+      [
+        "30b23a31e46130ae"
+      ]
+    ],
+    "info": "Устанавливает увеличенный радиус точек на графике процесса кристаллизации."
   }
 ]
